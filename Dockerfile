@@ -5,8 +5,8 @@ FROM r-base
 RUN apt-get update && apt-get install -y \
 	libcurl4-openssl-dev \
 	libxml2-dev
-RUN R -e "install.packages(c('snow', 'DBI', 'RSQLite', 'RCurl', 'xtable', 'openssl', 'Rmpi', 'covr', 'rlecuyer', 'ggplot2', 'reshape2'), repos='http://cran-mirror.cs.uu.nl/', dependencies=TRUE)"
-RUN R -e "install.packages(c('qusage', 'GSEABase', 'GSVA'), repos='http://bioconductor.org/packages/3.5/bioc')"
+RUN R -e "install.packages(c('snow', 'DBI', 'RSQLite', 'RCurl', 'xtable', 'openssl', 'Rmpi', 'covr', 'rlecuyer', 'ggplot2', 'reshape2'), repos='http://cran.rstudio.com/', dependencies=TRUE)"
+RUN R -e "install.packages(c('qusage', 'GSEABase', 'GSVA'), repos='http://bioconductor.org/packages/3.13/bioc')"
 
 
 COPY . /usr/local/src/scripts/

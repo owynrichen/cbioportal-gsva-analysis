@@ -46,10 +46,10 @@ cat(paste0("\n\n---> Load expression file ", expr_file, " and geneset file ",  g
 genesets <- read.gmt(geneset_file)  # Will put genesets in named list
 
 # Load expression file
-expr <- read.delim(expr_file, sep="\t", header=T, row.names=2, quote="")
+expr <- read.delim(expr_file, sep="\t", header=T, row.names=1)
 
 # Check if we need to remove the hugo or entrez gene columns
-if (length(grep("[A-Z]", genesets[1], perl=TRUE, value=TRUE)) == 0) {
+if (length(grep("[A-Z]", expr[1], perl=TRUE, value=TRUE)) == 0) {
   expr <- expr[,-1] # Use in case of entrez gene ids
 } else {
   # in case of hugo symbols:

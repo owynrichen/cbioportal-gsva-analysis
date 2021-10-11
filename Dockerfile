@@ -4,10 +4,12 @@ FROM r-base
 # Install packages to be able to run GSVA analysis in parallel
 RUN apt-get update && apt-get install -y \
 	libcurl4-openssl-dev \
-	libxml2-dev
-RUN R -e "install.packages(c('snow', 'DBI', 'RSQLite', 'RCurl', 'xtable', 'openssl', 'Rmpi', 'covr', 'rlecuyer', 'ggplot2', 'reshape2'), repos='http://cran-mirror.cs.uu.nl/', dependencies=TRUE)"
-RUN R -e "install.packages(c('qusage', 'GSEABase', 'GSVA'), repos='http://bioconductor.org/packages/3.5/bioc')"
-
+	libssl-dev \
+	libxml2-dev \
+	libfftw3-dev \
+	libfftw3-doc
+RUN R -e "install.packages(c('BiocManager'), repos='http://cran.rstudio.com/', dependencies=TRUE)"
+RUN R -e "BiocManager::install(c('qusage', 'GSEABase', 'GSVA'), version='3.13', update=TRUE, ask=FALSE)"
 
 COPY . /usr/local/src/scripts/
 WORKDIR /usr/local/src/scripts/

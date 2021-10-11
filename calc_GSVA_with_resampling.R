@@ -66,12 +66,12 @@ expr_norm_high <- expr_norm[mexp > 1, ]
 
 # Calculate original gene set scores
 cat("\n\n---> Calculate GSVA scores original genesets with ", n_cores," number of cores\n\n")
-full_set_gsva_result <- gsva(as.matrix(expr_norm_high), genesets, method="gsva", parallel.sz=n_cores, parallel.type="SOCK")
+full_set_gsva_result <- gsva(as.matrix(expr_norm_high), genesets, method="gsva", parallel.sz=n_cores)
 
 # Write scores to file
 cat(paste0("\n\n---> Output file original GSVA written to ", prefix_out, "gsva_scores.txt \n\n"))
-colnames(full_set_gsva_result$es.obs) <- gsub("\\.", "-", colnames(full_set_gsva_result$es.obs))
-scores = cbind(geneset_id = rownames(full_set_gsva_result$es.obs), full_set_gsva_result$es.obs)
+colnames(full_set_gsva_result) <- gsub("\\.", "-", colnames(full_set_gsva_result))
+scores = cbind(geneset_id = rownames(full_set_gsva_result), full_set_gsva_result)
 write.table(scores, paste0(prefix_out, "data_gsva_scores.txt"), quote = F, sep = "\t", col.names = T, row.names = F)
 
 # If the user indicated that resamplings should be done, do resamplings
@@ -95,20 +95,20 @@ if (n_resampling > 0){
     new_genesets <- sample_geneset_from_dist(genesets)
     
     # Calculate GSVA scores for resampled gene sets
-    gene_resamp_gsva <- gsva(as.matrix(expr_norm_high), new_genesets, method="gsva", parallel.sz=n_cores, parallel.type="SOCK")
-    results <- data.frame(matrix(NA, nrow=nrow(full_set_gsva_result$es.obs), ncol=ncol(full_set_gsva_result$es.obs)))
+    gene_resamp_gsva <- gsva(as.matrix(expr_norm_high), new_genesets, method="gsva", parallel.sz=n_cores)
+    results <- data.frame(matrix(NA, nrow=nrow(full_set_gsva_result$), ncol=ncol(full_set_gsva_result)))
     
     # Save 'resampled' scores to list with dataframes (size of dataframes are the same and therefore can complete be added to list)
-    rownames(results) = rownames(full_set_gsva_result$es.obs)
-    colnames(results) = colnames(full_set_gsva_result$es.obs)
+    rownames(results) = rownames(full_set_gsva_result)
+    colnames(results) = colnames(full_set_gsva_result)
     results[rownames(gene_resamp_gsva$es.obs),] <- gene_resamp_gsva$es.obs
     list_scores[[i]] <- results
   }
 
   # Create empty dataframe to add p-values
-  pvalues_calc <- data.frame(matrix(NA, nrow=nrow(full_set_gsva_result$es.obs), ncol=ncol(full_set_gsva_result$es.obs)))
-  rownames(pvalues_calc) = rownames(full_set_gsva_result$es.obs)
-  colnames(pvalues_calc) = colnames(full_set_gsva_result$es.obs)
+  pvalues_calc <- data.frame(matrix(NA, nrow=nrow(full_set_gsva_result), ncol=ncol(full_set_gsva_result)))
+  rownames(pvalues_calc) = rownames(full_set_gsva_result)
+  colnames(pvalues_calc) = colnames(full_set_gsva_result)
   
   # Calculating p-values with resampled values
   cat("\n\n---> Calculate pvalues")
@@ -121,7 +121,7 @@ if (n_resampling > 0){
       # than the calculated score for the original gene set
       # (-0.4 is still stronger than 0.2 but with previous method was not taken into account)
       # We add 1 to both sides of the division to account for the real GSVA value, and solve that you would never divide by 0 or get a pvalue of 0.
-      pvalues_calc[geneset,sample] <- (sum(abs(resampled_scores) >= abs(full_set_gsva_result$es.obs[geneset, sample])) + 1) / (n_resampling + 1)
+      pvalues_calc[geneset,sample] <- (sum(abs(resampled_scores) >= abs(full_set_gsva_result[geneset, sample])) + 1) / (n_resampling + 1)
 
       # PREVIOUS METHOD USED, CHANGED TO CHECKING THE ABSOLUTE VALUES
       ## Positive and negative scores needed separatly for calculation
@@ -191,8 +191,8 @@ geneset_def_version: ", geneset_def_version)
   write(meta_pvalues, paste0(prefix_out, "meta_gsva_pvalues.txt"))
 } else {
   # create dummy p-values instead of empty file
-  dummy_pvalues <- (full_set_gsva_result$es.obs * 0) + 0.01
-  gsva_pvalues <- data.frame("geneset_id" = rownames(full_set_gsva_result$es.obs), dummy_pvalues, check.names = F)
+  dummy_pvalues <- (full_set_gsva_result * 0) + 0.01
+  gsva_pvalues <- data.frame("geneset_id" = rownames(full_set_gsva_result), dummy_pvalues, check.names = F)
   colnames(gsva_pvalues) <- gsub("\\.", "-", colnames(gsva_pvalues))
   write.table(gsva_pvalues, paste0(prefix_out, "data_gsva_pvalues.txt"), quote = F, sep = "\t", col.names = T, row.names = F)
   
@@ -217,7 +217,7 @@ stable_id: ", study_id, "_gsva_scores
 case_list_name: Samples with GSVA data
 case_list_description: All samples with GSVA data
 case_list_category: all_cases_with_gsva_data
-case_list_ids:    ", paste0(colnames(full_set_gsva_result$es.obs), collapse = "\t")), collapse = "")
+case_list_ids:    ", paste0(colnames(full_set_gsva_result), collapse = "\t")), collapse = "")
 write(case_list, paste0(dirname(paste0(prefix_out, "meta_gsva_pvalues.txt")), "/case_lists/cases_GSVA.txt"))
 
 cat(paste0("\n\n---> Meta files written to ", prefix_out, "meta_gsva_scores.txt, ", prefix_out, "meta_gsva_pvalues.txt and ", prefix_out, "case_lists/cases_GSVA.txt\n\n"))

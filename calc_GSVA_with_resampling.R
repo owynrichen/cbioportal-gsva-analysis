@@ -96,7 +96,7 @@ if (n_resampling > 0){
     
     # Calculate GSVA scores for resampled gene sets
     gene_resamp_gsva <- gsva(as.matrix(expr_norm_high), new_genesets, method="gsva", parallel.sz=n_cores)
-    results <- data.frame(matrix(NA, nrow=nrow(full_set_gsva_result$), ncol=ncol(full_set_gsva_result)))
+    results <- data.frame(matrix(NA, nrow=nrow(full_set_gsva_result), ncol=ncol(full_set_gsva_result)))
     
     # Save 'resampled' scores to list with dataframes (size of dataframes are the same and therefore can complete be added to list)
     rownames(results) = rownames(full_set_gsva_result)
